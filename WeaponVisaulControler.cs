@@ -1,0 +1,167 @@
+using UnityEngine;
+using UnityEngine.Animations.Rigging;
+
+public class WeaponVisaulControler : MonoBehaviour
+{
+    private Rig rig;
+    private Animator amimr;
+
+    [Header("Gun")]
+    [SerializeField] private Transform[] gunTransform;
+    [SerializeField] private Transform pistol;
+    [SerializeField] private Transform revolver;
+    [SerializeField] private Transform rifle;
+    [SerializeField] private Transform shotgun;
+    [SerializeField] private Transform sniper;
+
+    [Header("Left hand target tranform")]
+    private Transform currentGunPOS;
+   
+
+    [Header("Rig")]
+    [SerializeField] private float rigIncreaseStep;
+    private bool isRigIncrease;
+    // private float timer = 0f;
+
+    [Header("Left hand IK")]
+    [SerializeField] private TwoBoneIKConstraint leftHandIK;
+    [SerializeField] private Transform leftHandIK_target;
+    [SerializeField] private float leftHandIK_InreaseStep = 1.5f;
+    private bool shouldIncreaseLeftHandIKWeight;
+    private bool busyGrabingWeapon; 
+   
+
+
+    private void Start()
+    {
+        SwitchGunOn(pistol);
+        amimr = GetComponentInChildren<Animator>();
+        rig = GetComponentInChildren<Rig>();
+    }
+
+    private void Update()
+    {
+        CheckWeaponSwitch();
+        if(Input.GetKeyDown(KeyCode.R) && (!busyGrabingWeapon)){
+            amimr.SetBool("IsReloading", true);
+            amimr.SetTrigger("Reload");
+            PauseRig();
+ 
+        }
+ 
+        UpdateRigWeight();
+        UpdateLeftHandIKWeight();
+        
+    }
+
+    private void UpdateRigWeight(){
+        if(isRigIncrease){
+            // Debug.Log(isRigIncrease);
+            rig.weight += rigIncreaseStep * Time.deltaTime;
+            if(rig.weight >= 1){
+                isRigIncrease = false;
+                amimr.SetBool("IsReloading", false);
+            }
+        }
+    }
+
+    private void UpdateLeftHandIKWeight(){
+        if(shouldIncreaseLeftHandIKWeight){
+            leftHandIK.weight += leftHandIK_InreaseStep * Time.deltaTime;
+            if(leftHandIK.weight >= 1){
+                shouldIncreaseLeftHandIKWeight = false;
+            }
+        }
+    }
+    private void PauseRig(){
+        rig.weight = 0.1f;    
+    }
+
+    public void ReturnWeightToOne() => isRigIncrease = true;
+    public void ReturnWieghtHandWeightIK() => shouldIncreaseLeftHandIKWeight = true;
+ 
+    private void PlayerWeaponGrabAnimation(GrabType grabType) {
+        leftHandIK.weight = 0;
+        PauseRig();
+        amimr.SetTrigger("WeaponGrab"); 
+        amimr.SetFloat("WeaponGrabType", ((float)grabType));
+        SetBusyGrabingWeapon(true);
+    }
+
+    public void SetBusyGrabingWeapon(bool isBusy){
+        busyGrabingWeapon = isBusy;
+        amimr.SetBool("IsGrabingWeapon", busyGrabingWeapon);
+    }
+ 
+
+    private void CheckWeaponSwitch(){
+        
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {   
+            SwitchGunOn(pistol);
+            ChangeAnimationGunFire(1);
+            PlayerWeaponGrabAnimation(GrabType.BackGrab);
+
+        };
+        if (Input.GetKeyDown(KeyCode.Alpha2)) { 
+            SwitchGunOn(revolver); 
+            ChangeAnimationGunFire(1); 
+            PlayerWeaponGrabAnimation(GrabType.BackGrab);
+            };
+        if (Input.GetKeyDown(KeyCode.Alpha3)) { 
+            SwitchGunOn(rifle); 
+            ChangeAnimationGunFire(1); 
+            PlayerWeaponGrabAnimation(GrabType.SideGrab);
+            };
+        if (Input.GetKeyDown(KeyCode.Alpha4)) { 
+            SwitchGunOn(shotgun); 
+            ChangeAnimationGunFire(2); 
+            PlayerWeaponGrabAnimation(GrabType.SideGrab);
+            };
+        if (Input.GetKeyDown(KeyCode.Alpha5)) { 
+            SwitchGunOn(sniper); 
+            ChangeAnimationGunFire(3); 
+            PlayerWeaponGrabAnimation(GrabType.SideGrab);
+            };
+    }
+
+    private void SwitchGunOn(Transform gunTransfrom)
+    {
+        SwitchGunOff();
+        gunTransfrom.gameObject.SetActive(true);
+        currentGunPOS = gunTransfrom;
+        AttachLeftHand();
+    }
+
+    private void SwitchGunOff()
+    {
+        for (int i = 0; i < gunTransform.Length; i++)
+        {
+            gunTransform[i].gameObject.SetActive(false);
+        }
+    }
+
+    private void AttachLeftHand()
+    {
+        Transform targetTranform = currentGunPOS.GetComponentInChildren<LeftHandTargetTranform>().transform;
+        leftHandIK_target.localPosition = targetTranform.localPosition;
+        leftHandIK_target.localRotation = targetTranform.localRotation;
+
+    }
+
+    private void ChangeAnimationGunFire(int animatorLayerIdx)
+    {
+        amimr.SetBool("IsReloading", false);
+        
+        for (int i = 1; i < amimr.layerCount; i++)
+        {
+            amimr.SetLayerWeight(i, 0);
+        }
+        amimr.SetLayerWeight(animatorLayerIdx, 1);
+        amimr.SetInteger("IsLayerIdx", animatorLayerIdx);
+    }
+
+
+}
+
+public enum GrabType {SideGrab=0, BackGrab=1};
