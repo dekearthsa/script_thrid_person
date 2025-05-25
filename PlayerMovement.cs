@@ -6,6 +6,7 @@ using UnityEngine.Animations.Rigging;
 public class PlayerMovement : MonoBehaviour
 {   
     private Rig rig;
+    private WeaponVisaulControler weaponVisaulControler;
     private Player player;
     private PlayerControl controls;
     private CharacterController characterController; 
@@ -24,9 +25,9 @@ public class PlayerMovement : MonoBehaviour
 
     
  
-    private Vector2 moveInput;
+    public Vector2 moveInput {get; private set;}
     // private Vector2 aimInput;
-    private bool nowCombatMode = true;
+    public bool nowCombatMode = true;
 
     // private void Awake() {
         
@@ -37,6 +38,7 @@ public class PlayerMovement : MonoBehaviour
         rig = GetComponentInChildren<Rig>();
         characterController = GetComponent<CharacterController>();
         animator = GetComponentInChildren<Animator>();
+        weaponVisaulControler = GetComponentInChildren<WeaponVisaulControler>();
 
         FunctionPlayControl();
     }
@@ -50,7 +52,7 @@ public class PlayerMovement : MonoBehaviour
     }
 
     private void ApplyRotation() {
-        Vector3 lookingDirection = player.aim.GetMousePosition() - transform.position;
+        Vector3 lookingDirection = player.aim.GetMouseHitInfo().point - transform.position;
         lookingDirection.y = 0;
         lookingDirection.Normalize();
         // transform.forward = lookingDirection; //// หันทันที 
@@ -90,12 +92,12 @@ public class PlayerMovement : MonoBehaviour
         ApplyGravity(); 
         if(movementDirection.magnitude > 0){
             if(!nowCombatMode){
-                characterController.Move(movementDirection * Time.deltaTime * 2.5f); // walking none combat mode
+                characterController.Move(movementDirection * Time.deltaTime * 3f); // walking none combat mode
             }else{
                 if(isRunning == false){
-                    characterController.Move(movementDirection * Time.deltaTime * 2.5f); // Speed combat walk
+                    characterController.Move(movementDirection * Time.deltaTime * 5f); // Speed combat walk
                 }else{
-                    characterController.Move(movementDirection * Time.deltaTime * 5f); // Speed combat Running
+                    characterController.Move(movementDirection * Time.deltaTime * 8f); // Speed combat Running
                 }
             }
             
@@ -121,9 +123,11 @@ public class PlayerMovement : MonoBehaviour
         
         if(Input.GetKeyDown(KeyCode.Q)){
             // Debug.Log();
+           
             if(nowCombatMode){
                 animator.SetBool("IsCombat", false);
                 nowCombatMode= false;
+                 weaponVisaulControler.SwitchGunOff();
                 for (int i = 1; i < animator.layerCount; i++)
                 {
                     animator.SetLayerWeight(i, 0);
@@ -133,14 +137,15 @@ public class PlayerMovement : MonoBehaviour
                 animator.SetBool("IsCombat", true);
                 nowCombatMode= true;
                 rig.weight = 1;
+                weaponVisaulControler.SwitchGunOn(weaponVisaulControler.currentGunPOS);
                 for (int i = 1; i < animator.layerCount; i++)
                 {
                     animator.SetLayerWeight(i, 0);
                 }
-                for (int i = 1; i < animator.layerCount; i++)
-                {
-                    animator.SetLayerWeight(i, 0);
-                }
+                // for (int i = 1; i < animator.layerCount; i++)
+                // {
+                //     animator.SetLayerWeight(i, 0);
+                // }
                 
                  animator.SetLayerWeight(1, animator.GetInteger("IsLayerIdx"));
             }

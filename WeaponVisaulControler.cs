@@ -5,6 +5,7 @@ public class WeaponVisaulControler : MonoBehaviour
 {
     private Rig rig;
     private Animator amimr;
+    private PlayerMovement playerMovement;
 
     [Header("Gun")]
     [SerializeField] private Transform[] gunTransform;
@@ -15,7 +16,7 @@ public class WeaponVisaulControler : MonoBehaviour
     [SerializeField] private Transform sniper;
 
     [Header("Left hand target tranform")]
-    private Transform currentGunPOS;
+    public Transform currentGunPOS;
    
 
     [Header("Rig")]
@@ -37,6 +38,7 @@ public class WeaponVisaulControler : MonoBehaviour
         SwitchGunOn(pistol);
         amimr = GetComponentInChildren<Animator>();
         rig = GetComponentInChildren<Rig>();
+        playerMovement = GetComponentInChildren<PlayerMovement>();
     }
 
     private void Update()
@@ -98,34 +100,55 @@ public class WeaponVisaulControler : MonoBehaviour
         
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {   
+            playerMovement.nowCombatMode = true;
+            StartAnimationCombatMode();
             SwitchGunOn(pistol);
             ChangeAnimationGunFire(1);
             PlayerWeaponGrabAnimation(GrabType.BackGrab);
 
         };
         if (Input.GetKeyDown(KeyCode.Alpha2)) { 
+            playerMovement.nowCombatMode = true;
+            StartAnimationCombatMode();
             SwitchGunOn(revolver); 
             ChangeAnimationGunFire(1); 
             PlayerWeaponGrabAnimation(GrabType.BackGrab);
             };
         if (Input.GetKeyDown(KeyCode.Alpha3)) { 
+            playerMovement.nowCombatMode = true;
+            StartAnimationCombatMode();
             SwitchGunOn(rifle); 
             ChangeAnimationGunFire(1); 
             PlayerWeaponGrabAnimation(GrabType.SideGrab);
             };
         if (Input.GetKeyDown(KeyCode.Alpha4)) { 
+            playerMovement.nowCombatMode = true;
+            StartAnimationCombatMode();
             SwitchGunOn(shotgun); 
             ChangeAnimationGunFire(2); 
             PlayerWeaponGrabAnimation(GrabType.SideGrab);
             };
         if (Input.GetKeyDown(KeyCode.Alpha5)) { 
+            playerMovement.nowCombatMode = true;
+            StartAnimationCombatMode();
             SwitchGunOn(sniper); 
             ChangeAnimationGunFire(3); 
             PlayerWeaponGrabAnimation(GrabType.SideGrab);
             };
     }
 
-    private void SwitchGunOn(Transform gunTransfrom)
+    private void StartAnimationCombatMode(){
+        amimr.SetBool("IsCombat", true);
+        rig.weight = 1;
+        for (int i = 1; i < amimr.layerCount; i++)
+        {
+            amimr.SetLayerWeight(i, 0);
+        }
+        amimr.SetLayerWeight(1, amimr.GetInteger("IsLayerIdx"));
+    }
+
+
+    public void SwitchGunOn(Transform gunTransfrom)
     {
         SwitchGunOff();
         gunTransfrom.gameObject.SetActive(true);
@@ -133,7 +156,7 @@ public class WeaponVisaulControler : MonoBehaviour
         AttachLeftHand();
     }
 
-    private void SwitchGunOff()
+    public void SwitchGunOff()
     {
         for (int i = 0; i < gunTransform.Length; i++)
         {
