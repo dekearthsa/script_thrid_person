@@ -30,21 +30,28 @@ public class PlayerControllerWaepon : MonoBehaviour
         }
     }
 
-    private Vector3 BulletDirection(){
+    public Vector3 BulletDirection(){
         Vector3 direction = (aim.position - gunPoint.position).normalized;
-        if(player.aim.CanAimPrecisly()){
+        try{
+            if(player.aim.CanAimPrecisly()){
              direction.y = 0;
+            }
+        
+            weaponHolder.LookAt(aim);
+            gunPoint.LookAt(weaponHolder);
+            return direction;
+        }catch{
+            return direction;
         }
-       
-        weaponHolder.LookAt(aim);
-        gunPoint.LookAt(weaponHolder);
-        return direction;
+        
     }
 
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawLine(weaponHolder.position, weaponHolder.position + weaponHolder.forward * 25);
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(gunPoint.position, gunPoint.position +BulletDirection()* 25);
-    }
+    public Transform GunPoint() => gunPoint;
+
+    // private void OnDrawGizmos()
+    // {
+    //     Gizmos.DrawLine(weaponHolder.position, weaponHolder.position + weaponHolder.forward * 25);
+    //     Gizmos.color = Color.red;
+    //     Gizmos.DrawLine(gunPoint.position, gunPoint.position +BulletDirection()* 25);
+    // }
 }

@@ -1,6 +1,8 @@
 using System;
 using UnityEngine;
 using Cinemachine;
+using UnityEngine.EventSystems;
+
 
 public class PlayerAim : MonoBehaviour
 {
@@ -10,9 +12,16 @@ public class PlayerAim : MonoBehaviour
     [SerializeField] public Transform playerObject; // ตัวที่ให้ตามตอนปล่อยเมาส์
     private Player player; 
     private PlayerControl controls; 
+    [Header("Aim Viusal - Laser")]
+    [SerializeField] private LineRenderer aimLaser;
+    // [SerializeField] private float tipLenght = 5f;
+    // private bool isUpdateTipLength =false;
+    // private float lastestTipLength;
+
     [Header("Aim control")]
     [SerializeField] Transform aim;
     [SerializeField] private bool isAimingPrecisly;
+    //  private LineRenderer lineRenderer;
 
     [Header("Camera control")]
     
@@ -31,16 +40,53 @@ public class PlayerAim : MonoBehaviour
     {
         player = GetComponent<Player>();
         PlayerAimAssgin();
-        
     }
 
     void Update()
     {
-        aim.position = GetMouseHitInfo().point;
+        UpdateAimLaser();
         ChangeAimMode();
+        LaserHandler();
         if(isAimingPrecisly){
-            aim.position = new Vector3(aim.position.x, transform.position.y + 1, aim.position.z);
-        }        
+            aim.position = new Vector3(GetMouseHitInfo().point.x, transform.position.y + 1, GetMouseHitInfo().point.z);    
+        }else{
+            aim.position = GetMouseHitInfo().point;
+        }
+    }
+
+    private void LaserHandler(){
+        if(Input.GetKeyDown(KeyCode.T)){
+            Debug.Log(aimLaser.enabled);
+            if(aimLaser.enabled){
+                aimLaser.enabled = false;
+            }else{
+                aimLaser.enabled = true;
+            }
+        }
+    }
+
+    private void UpdateAimLaser(){
+        Transform gunPoint = player.weapon.GunPoint();
+        Vector3 laserDirection = player.weapon.BulletDirection();
+        // // demo variable
+        float tipLenght = 5f;
+        float gunDistance = 4f;
+
+        Vector3  endPoint = gunPoint.position + laserDirection * gunDistance;
+
+        if(Physics.Raycast(gunPoint.position, laserDirection, out RaycastHit hit, gunDistance)){
+            endPoint = hit.point;
+            tipLenght=  0;
+            // isUpdateTipLength = false;
+            // if(!isUpdateTipLength){
+            //     isUpdateTipLength = true;
+            //     lastestTipLength = tipLenght;
+            // }
+        }
+        // lastestTipLength = tipLenght;
+        aimLaser.SetPosition(0, gunPoint.position);
+        aimLaser.SetPosition(1,endPoint);
+        aimLaser.SetPosition(2, endPoint + laserDirection * tipLenght);
     }
 
     private void ChangeAimMode(){
