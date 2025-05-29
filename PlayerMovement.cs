@@ -28,9 +28,14 @@ public class PlayerMovement : MonoBehaviour
     public Vector2 moveInput {get; private set;}
     // private Vector2 aimInput;
     public bool nowCombatMode = true;
+    
+    // public float rotationAngle = 90f; // หมุนทีละ 90 องศา 
+    // public float rotateSpeed = 360f; // องศาต่อวินาที
+    // private float currentY = 0f;
+
 
     // private void Awake() {
-        
+
     // }
     private void Start()
     {
@@ -49,6 +54,7 @@ public class PlayerMovement : MonoBehaviour
         ApplyMovementCB();
         ApplyRotation();
         AnimatorController();
+        // ChangeCameraRotation();
     }
 
     private void ApplyRotation() {
@@ -88,7 +94,18 @@ public class PlayerMovement : MonoBehaviour
     }
 
     private void ApplyMovementCB(){
-        movementDirection = new Vector3(moveInput.x, 0f, moveInput.y);
+        float h = Input.GetAxis("Horizontal"); // A/D
+        float v = Input.GetAxis("Vertical");   // W/S
+        Transform cam = Camera.main.transform;
+
+        // ดึง forward และ right ของกล้อง แล้วทำให้แบนราบ (ไม่เอาแกน y)
+        Vector3 camForward = Vector3.Scale(cam.forward, new Vector3(1, 0, 1)).normalized;
+        Vector3 camRight = Vector3.Scale(cam.right, new Vector3(1, 0, 1)).normalized;
+
+        // คำนวณทิศทางตามกล้อง
+        movementDirection = camForward * v + camRight * h;
+
+        // movementDirection = new Vector3(moveInput.x, 0f, moveInput.y);
         ApplyGravity(); 
         if(movementDirection.magnitude > 0){
             if(!nowCombatMode){
@@ -100,18 +117,30 @@ public class PlayerMovement : MonoBehaviour
                     characterController.Move(movementDirection * Time.deltaTime * 8f); // Speed combat Running
                 }
             }
-            
-            
         }
     }
 
-    private void AnimatorController(){
+    // private void ChangeCameraRotation()
+    // {
+ 
+    //        if (Input.GetKeyDown(KeyCode.E))
+    //     {
+    //         currentY += 90f;
+    //         if (currentY >= 360f) currentY -= 360f;
+
+    //         transform.rotation = Quaternion.Euler(60f, currentY, 0f); // 60 เป็นค่า X เดิมของคุณ
+    //     }
+    // }
+ 
+
+    private void AnimatorController()
+    {
         float xVelocity = Vector3.Dot(movementDirection.normalized, transform.right);
         float zVelocity = Vector3.Dot(movementDirection.normalized, transform.forward);
 
         /// animator.SetFloat(ชื่อ Animator ที่เราตั้งใน Animator parameter , ค่าที่เปลี่ยนแปลง, เพิ่มความ Smooth ของ animation, ปรับให้เวลาเป็นไปตาม Frame จริง ๆ);
-        animator.SetFloat("xVelocity",xVelocity, .1f,  Time.deltaTime);
-        animator.SetFloat("zVelocity",zVelocity, .1f, Time.deltaTime); 
+        animator.SetFloat("xVelocity", xVelocity, .1f, Time.deltaTime);
+        animator.SetFloat("zVelocity", zVelocity, .1f, Time.deltaTime);
 
         bool playerRunAnimation = isRunning && movementDirection.magnitude > 0;
         animator.SetBool("isRunning", playerRunAnimation);
@@ -121,7 +150,7 @@ public class PlayerMovement : MonoBehaviour
     
     private void SetWalkingNoneCombat(){
         
-        if(Input.GetKeyDown(KeyCode.Q)){
+        if(Input.GetKeyDown(KeyCode.V)){
             // Debug.Log();
            
             if(nowCombatMode){
