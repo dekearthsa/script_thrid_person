@@ -8,6 +8,7 @@ public class PlayerAim : MonoBehaviour
 {
 
     public CinemachineVirtualCamera virtualCamera; // กล้องเสมือน
+    private float cameraYRotationFloat;
     [SerializeField] public Transform aimObject; // ตัวที่อยากให้ตามตอนกดเมาส์
     [SerializeField] public Transform playerObject; // ตัวที่ให้ตามตอนปล่อยเมาส์
     private Player player; 
@@ -74,9 +75,13 @@ public class PlayerAim : MonoBehaviour
 
         Vector3  endPoint = gunPoint.position + laserDirection * gunDistance;
 
-        if(Physics.Raycast(gunPoint.position, laserDirection, out RaycastHit hit, gunDistance)){
+        if (Physics.Raycast(gunPoint.position, laserDirection, out RaycastHit hit, gunDistance))
+        {
             endPoint = hit.point;
-            tipLenght=  0;
+            tipLenght = 0;
+            // Debug.Log("gun point " + gunPoint.position);
+            // Debug.Log("hit.point "+hit.point);
+            // Debug.Log("gunDistance " +gunDistance);
             // isUpdateTipLength = false;
             // if(!isUpdateTipLength){
             //     isUpdateTipLength = true;
@@ -122,27 +127,37 @@ public class PlayerAim : MonoBehaviour
 
 
     private Vector3 DesieredCameraPostion(){
+        Quaternion rotationCam = virtualCamera.transform.rotation;
+        Vector3 eulerRotation = rotationCam.eulerAngles;
+        cameraYRotationFloat= Mathf.Abs(eulerRotation.y);
+        int cameraRotationNor = Mathf.FloorToInt(cameraYRotationFloat);
+        // Debug.Log("Y rotation angle: " + cameraRotationNor);
 
-        float actualMaxCameraDistance = player.movement.moveInput.y < -.5f? minCameraDistance: maxCameraDistance;
+        if (cameraRotationNor >= 175 && cameraRotationNor <= 185 )
+        {
+            // cameraYRotationFloat = 0f;
+            float actualMaxCameraDistance = player.movement.moveInput.y < +.5f ? minCameraDistance : maxCameraDistance;
+            Vector3  desieredCameraPostion = GetMouseHitInfo().point;
+            Vector3 aimDirection = (desieredCameraPostion - transform.position).normalized;
+            float distainceToDesierdPosition = Vector3.Distance(transform.position, desieredCameraPostion);
+            float clampedDistance = Mathf.Clamp(distainceToDesierdPosition, minCameraDistance, actualMaxCameraDistance);
+            desieredCameraPostion = transform.position + aimDirection * clampedDistance;
+            desieredCameraPostion.y = transform.position.y + 1;
+            return desieredCameraPostion;   
+        }
+        else
+        {
+            float actualMaxCameraDistance = player.movement.moveInput.y < -.5f? minCameraDistance: maxCameraDistance;
+            Vector3  desieredCameraPostion = GetMouseHitInfo().point;
+            Vector3 aimDirection = (desieredCameraPostion - transform.position).normalized;
+            float distainceToDesierdPosition = Vector3.Distance(transform.position, desieredCameraPostion);
+            float clampedDistance = Mathf.Clamp(distainceToDesierdPosition, minCameraDistance, actualMaxCameraDistance);
+            desieredCameraPostion = transform.position + aimDirection * clampedDistance;
+            desieredCameraPostion.y = transform.position.y + 1;
+            return desieredCameraPostion;   
+        }
         
-        Vector3  desieredCameraPostion = GetMouseHitInfo().point;
-        Vector3 aimDirection = (desieredCameraPostion - transform.position).normalized;
-        //  Debug.Log("desieredCameraPostion => " + desieredCameraPostion);
-        //  Debug.Log("aimDirection => " + aimDirection);
-        //  Debug.Log("transform.position => " + transform.position);
-        float distainceToDesierdPosition = Vector3.Distance(transform.position, desieredCameraPostion);
-
-        float clampedDistance = Mathf.Clamp(distainceToDesierdPosition, minCameraDistance, actualMaxCameraDistance);
-        desieredCameraPostion = transform.position + aimDirection * clampedDistance;
-         // transform.position ตำแหน่งปัจจุบันของ Object (ในที่นี้คือ Player), aimDirection ค่าของตำแหน่งเมาส์ลบด้วยตำแหน่งของ object ตัวละคร 
-        //  if (distainceToDesierdPosition > maxCameraDistance ){
-        //     desieredCameraPostion = transform.position + aimDirection * maxCameraDistance;
-        //  }else if(distainceToDesierdPosition < minCameraDistance){
-        //     desieredCameraPostion = transform.position + aimDirection * minCameraDistance;
-        //  }
-         
-        desieredCameraPostion.y = transform.position.y + 1;
-        return desieredCameraPostion;
+        
     }
 
     private void UpdateCameraPostion(){
