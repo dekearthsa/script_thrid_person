@@ -5,6 +5,7 @@ public class PlayerControllerWaepon : MonoBehaviour
 {
     private Player player;
     private PlayerMovement playerMovement;
+    private float REF_BULLET_SPEED = 30f;
      [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private float bulletSpeed;
     [SerializeField] private Transform gunPoint;
@@ -24,7 +25,12 @@ public class PlayerControllerWaepon : MonoBehaviour
     private void Shoot(){
         if(playerMovement.nowCombatMode){
             GameObject newBullet = Instantiate(bulletPrefab, gunPoint.position, Quaternion.LookRotation(gunPoint.forward));
-            newBullet.GetComponent<Rigidbody>().linearVelocity = BulletDirection() * bulletSpeed;
+
+            Rigidbody rbNewBullet = newBullet.GetComponent<Rigidbody>();
+
+            rbNewBullet.mass = REF_BULLET_SPEED / bulletSpeed;
+            rbNewBullet.linearVelocity = BulletDirection() * bulletSpeed;
+            // newBullet.GetComponent<Rigidbody>().linearVelocity = BulletDirection() * bulletSpeed;
             Destroy(newBullet,3);
             GetComponentInChildren<Animator>().SetTrigger("Fire");
         }
