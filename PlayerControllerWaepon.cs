@@ -6,24 +6,32 @@ public class PlayerControllerWaepon : MonoBehaviour
     private Player player;
     private PlayerMovement playerMovement;
     private float REF_BULLET_SPEED = 30f;
-     [SerializeField] private GameObject bulletPrefab;
+    [Header("Bullet detail")]
+    [SerializeField] private Weapon currentWeapon;
+    [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private float bulletSpeed;
     [SerializeField] private Transform gunPoint;
     
     [SerializeField] private Transform weaponHolder;
     // [SerializeField] private Transform aim;
     // [SerializeField] private 
- 
+
     void Start()
     {
         player = GetComponent<Player>();
         playerMovement = GetComponentInChildren<PlayerMovement>();
         player.controls.Character.Fire.performed += ctx => Shoot();
+
+        currentWeapon.ammo = currentWeapon.maxAmmo;
     }
  
       
     private void Shoot(){
         if(playerMovement.nowCombatMode){
+            if (currentWeapon.ammo <= 0) {
+                return;
+            }
+            currentWeapon.ammo--;
             GameObject newBullet = Instantiate(bulletPrefab, gunPoint.position, Quaternion.LookRotation(gunPoint.forward));
 
             Rigidbody rbNewBullet = newBullet.GetComponent<Rigidbody>();
