@@ -1,5 +1,7 @@
 using Unity.Mathematics;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor.Rendering.LookDev;
 
 public class PlayerControllerWaepon : MonoBehaviour
 {
@@ -7,28 +9,47 @@ public class PlayerControllerWaepon : MonoBehaviour
     private PlayerMovement playerMovement;
     private float REF_BULLET_SPEED = 30f;
     [Header("Bullet detail")]
-    [SerializeField] private Weapon currentWeapon;
+    
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private float bulletSpeed;
     [SerializeField] private Transform gunPoint;
     
     [SerializeField] private Transform weaponHolder;
-    // [SerializeField] private Transform aim;
-    // [SerializeField] private 
+
+    [Header("Inventory")]
+    [SerializeField] private Weapon currentWeapon;
+    [SerializeField] private List<Weapon> weaponSlots;
 
     void Start()
     {
         player = GetComponent<Player>();
         playerMovement = GetComponentInChildren<PlayerMovement>();
-        player.controls.Character.Fire.performed += ctx => Shoot();
+        AssignInputEvent();
 
         currentWeapon.ammo = currentWeapon.maxAmmo;
     }
+
+    private void AssignInputEvent()
+    {
+        PlayerControl controls = player.controls;
+        controls.Character.Fire.performed += ctx => Shoot();
+        controls.Character.EquipSlots1.performed += context => EquipWeapon(0);
+        controls.Character.EquipSlots2.performed += context => EquipWeapon(1);
+    }
+
+
+    private void EquipWeapon(int i)
+    {
+        currentWeapon = weaponSlots[i];
+    }
  
       
-    private void Shoot(){
-        if(playerMovement.nowCombatMode){
-            if (currentWeapon.ammo <= 0) {
+    private void Shoot()
+    {
+        if (playerMovement.nowCombatMode)
+        {
+            if (currentWeapon.ammo <= 0)
+            {
                 return;
             }
             currentWeapon.ammo--;
@@ -39,7 +60,7 @@ public class PlayerControllerWaepon : MonoBehaviour
             rbNewBullet.mass = REF_BULLET_SPEED / bulletSpeed;
             rbNewBullet.linearVelocity = BulletDirection() * bulletSpeed;
             // newBullet.GetComponent<Rigidbody>().linearVelocity = BulletDirection() * bulletSpeed;
-            Destroy(newBullet,3);
+            Destroy(newBullet, 3);
             GetComponentInChildren<Animator>().SetTrigger("Fire");
         }
     }
