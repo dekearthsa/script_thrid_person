@@ -11,7 +11,8 @@ public class PlayerAim : MonoBehaviour
     private float cameraYRotationFloat;
     [SerializeField] public Transform aimObject; // ตัวที่อยากให้ตามตอนกดเมาส์
     [SerializeField] public Transform playerObject; // ตัวที่ให้ตามตอนปล่อยเมาส์
-    private Player player; 
+    private Player player;
+    private WeaponVisaulControler weaponVisaulControler;
     private PlayerControl controls; 
     [Header("Aim Viusal - Laser")]
     [SerializeField] private LineRenderer aimLaser;
@@ -40,6 +41,7 @@ public class PlayerAim : MonoBehaviour
      void Start()
     {
         player = GetComponent<Player>();
+        weaponVisaulControler = GetComponent<WeaponVisaulControler>();
         PlayerAimAssgin();
     }
 
@@ -67,31 +69,36 @@ public class PlayerAim : MonoBehaviour
     }
 
     private void UpdateAimVisauls(){
+
         Transform gunPoint = player.weapon.GunPoint();
-        Vector3 laserDirection = player.weapon.BulletDirection();
-        // // demo variable
-        float tipLenght = 5f;
-        float gunDistance = 4f;
-
-        Vector3  endPoint = gunPoint.position + laserDirection * gunDistance;
-
-        if (Physics.Raycast(gunPoint.position, laserDirection, out RaycastHit hit, gunDistance))
+        
+        if (weaponVisaulControler.leftHandIK.weight >= 1)
         {
-            endPoint = hit.point;
-            tipLenght = 0;
-            // Debug.Log("gun point " + gunPoint.position);
-            // Debug.Log("hit.point "+hit.point);
-            // Debug.Log("gunDistance " +gunDistance);
-            // isUpdateTipLength = false;
-            // if(!isUpdateTipLength){
-            //     isUpdateTipLength = true;
-            //     lastestTipLength = tipLenght;
-            // }
+
+            float tipLenght = 5f;
+            float gunDistance = 4f;
+            Vector3 laserDirection = player.weapon.BulletDirection();
+            Vector3 endPoint = gunPoint.position + laserDirection * gunDistance;
+
+
+            if (Physics.Raycast(gunPoint.position, laserDirection, out RaycastHit hit, gunDistance))
+            {
+                endPoint = hit.point;
+                tipLenght = 0;
+      
+            }
+ 
+            aimLaser.SetPosition(0, gunPoint.position);
+            aimLaser.SetPosition(1, endPoint);
+            aimLaser.SetPosition(2, endPoint + laserDirection * tipLenght);
         }
-        // lastestTipLength = tipLenght;
-        aimLaser.SetPosition(0, gunPoint.position);
-        aimLaser.SetPosition(1,endPoint);
-        aimLaser.SetPosition(2, endPoint + laserDirection * tipLenght);
+        else
+        {
+            aimLaser.SetPosition(0, gunPoint.position);
+            aimLaser.SetPosition(1, gunPoint.position);
+            aimLaser.SetPosition(2, gunPoint.position);
+        }
+        
     }
 
     private void ChangeAimMode(){
@@ -104,7 +111,7 @@ public class PlayerAim : MonoBehaviour
             isAimingPrecisly = true;
             virtualCamera.Follow = playerObject;
             UpdateCameraPostion();
-            // aim.position = new Vector3(GetMouseHitInfo().x, aim.position.y, GetMouseHitInfo().z);
+ 
         }
     }
 

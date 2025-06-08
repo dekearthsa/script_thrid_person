@@ -33,8 +33,8 @@ public class PlayerControllerWaepon : MonoBehaviour
     {
         PlayerControl controls = player.controls;
         controls.Character.Fire.performed += ctx => Shoot();
-        controls.Character.EquipSlots1.performed += context => EquipWeapon(0);
-        controls.Character.EquipSlots2.performed += context => EquipWeapon(1);
+        controls.Character.Equipweapon1.performed += context => EquipWeapon(0);
+        controls.Character.Equipweapon2.performed += context => EquipWeapon(1);
     }
 
 
@@ -59,7 +59,7 @@ public class PlayerControllerWaepon : MonoBehaviour
 
             rbNewBullet.mass = REF_BULLET_SPEED / bulletSpeed;
             rbNewBullet.linearVelocity = BulletDirection() * bulletSpeed;
-            // newBullet.GetComponent<Rigidbody>().linearVelocity = BulletDirection() * bulletSpeed;
+        
             Destroy(newBullet, 3);
             GetComponentInChildren<Animator>().SetTrigger("Fire");
         }
@@ -84,10 +84,5 @@ public class PlayerControllerWaepon : MonoBehaviour
 
     public Transform GunPoint() => gunPoint;
 
-    // private void OnDrawGizmos()
-    // {
-    //     Gizmos.DrawLine(weaponHolder.position, weaponHolder.position + weaponHolder.forward * 25);
-    //     Gizmos.color = Color.red;
-    //     Gizmos.DrawLine(gunPoint.position, gunPoint.position +BulletDirection()* 25);
-    // }
+ 
 }

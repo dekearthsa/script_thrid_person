@@ -25,14 +25,13 @@ public class WeaponVisaulControler : MonoBehaviour
     // private float timer = 0f;
 
     [Header("Left hand IK")]
-    [SerializeField] private TwoBoneIKConstraint leftHandIK;
+    [SerializeField] public TwoBoneIKConstraint leftHandIK;
     [SerializeField] private Transform leftHandIK_target;
     [SerializeField] private float leftHandIK_InreaseStep = 1.5f;
     private bool shouldIncreaseLeftHandIKWeight;
-    private bool busyGrabingWeapon; 
-   
+    private bool busyGrabingWeapon;
 
-
+ 
     private void Start()
     {
         SwitchGunOn(pistol);
@@ -83,6 +82,9 @@ public class WeaponVisaulControler : MonoBehaviour
     public void ReturnWieghtHandWeightIK() => shouldIncreaseLeftHandIKWeight = true;
  
     private void PlayerWeaponGrabAnimation(GrabType grabType) {
+        // wepaonPOS = leftHandPOS.transform;
+        // wepaonPOS.position = leftHandPOS.position;
+        // wepaonPOS.rotation = leftHandPOS.rotation;
         leftHandIK.weight = 0;
         PauseRig();
         amimr.SetTrigger("WeaponGrab"); 
