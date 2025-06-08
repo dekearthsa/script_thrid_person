@@ -12,7 +12,7 @@ public class PlayerAim : MonoBehaviour
     [SerializeField] public Transform aimObject; // ตัวที่อยากให้ตามตอนกดเมาส์
     [SerializeField] public Transform playerObject; // ตัวที่ให้ตามตอนปล่อยเมาส์
     private Player player;
-    private WeaponVisaulControler weaponVisaulControler;
+    // private WeaponVisaulControler weaponVisaulControler;
     private PlayerControl controls; 
     [Header("Aim Viusal - Laser")]
     [SerializeField] private LineRenderer aimLaser;
@@ -41,7 +41,7 @@ public class PlayerAim : MonoBehaviour
      void Start()
     {
         player = GetComponent<Player>();
-        weaponVisaulControler = GetComponent<WeaponVisaulControler>();
+        // weaponVisaulControler = GetComponent<WeaponVisaulControler>();
         PlayerAimAssgin();
     }
 
@@ -72,7 +72,7 @@ public class PlayerAim : MonoBehaviour
 
         Transform gunPoint = player.weapon.GunPoint();
         
-        if (weaponVisaulControler.leftHandIK.weight >= 1)
+        if (player.weaponVisaulControler.leftHandIK.weight >= 1)
         {
 
             float tipLenght = 5f;

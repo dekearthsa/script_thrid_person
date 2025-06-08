@@ -43,23 +43,33 @@ public class WeaponVisaulControler : MonoBehaviour
     private void Update()
     {
         CheckWeaponSwitch();
-        if(Input.GetKeyDown(KeyCode.R) && (!busyGrabingWeapon)){
-            amimr.SetBool("IsReloading", true);
-            amimr.SetTrigger("Reload");
-            PauseRig();
+        // if(Input.GetKeyDown(KeyCode.R) && (!busyGrabingWeapon)){
+        //     PlayReloadAnimation();
  
-        }
+        // }
  
         UpdateRigWeight();
         UpdateLeftHandIKWeight();
         
     }
 
-    private void UpdateRigWeight(){
-        if(isRigIncrease){
+
+    public void PlayReloadAnimation()
+    {
+        if (busyGrabingWeapon) return;
+        amimr.SetBool("IsReloading", true);
+        amimr.SetTrigger("Reload");
+        PauseRig();
+    }
+
+    private void UpdateRigWeight()
+    {
+        if (isRigIncrease)
+        {
             // Debug.Log(isRigIncrease);
             rig.weight += rigIncreaseStep * Time.deltaTime;
-            if(rig.weight >= 1){
+            if (rig.weight >= 1)
+            {
                 isRigIncrease = false;
                 amimr.SetBool("IsReloading", false);
             }
