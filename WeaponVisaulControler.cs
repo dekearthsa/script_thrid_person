@@ -6,6 +6,8 @@ public class WeaponVisaulControler : MonoBehaviour
     private Rig rig;
     private Animator amimr;
     private PlayerMovement playerMovement;
+    private PlayerControllerWaepon playerControllerWaepon;
+    // private WeaponVisaulControler weaponVisaulControler;
 
     [Header("Gun")]
     [SerializeField] private Transform[] gunTransform;
@@ -30,14 +32,19 @@ public class WeaponVisaulControler : MonoBehaviour
     [SerializeField] private float leftHandIK_InreaseStep = 1.5f;
     private bool shouldIncreaseLeftHandIKWeight;
     private bool busyGrabingWeapon;
+    // private Weapon currentWeapon;
 
- 
+
+
     private void Start()
     {
         SwitchGunOn(pistol);
         amimr = GetComponentInChildren<Animator>();
         rig = GetComponentInChildren<Rig>();
         playerMovement = GetComponentInChildren<PlayerMovement>();
+        playerControllerWaepon = GetComponentInParent<PlayerControllerWaepon>();
+        // currentWeapon = GetComponentInParent<Weapon>();
+        // weaponVisaulControler = GetComponentInParent<WeaponVisaulControler>();
     }
 
     private void Update()
@@ -45,17 +52,32 @@ public class WeaponVisaulControler : MonoBehaviour
         CheckWeaponSwitch();
         // if(Input.GetKeyDown(KeyCode.R) && (!busyGrabingWeapon)){
         //     PlayReloadAnimation();
- 
+
         // }
- 
+        if (playerControllerWaepon.CurrentWeapon().isReloadingAimation == true && IsReloadAnimationFinished())
+        {
+            playerControllerWaepon.CurrentWeapon().isReloadingAimation = false;
+        }
+   
         UpdateRigWeight();
         UpdateLeftHandIKWeight();
         
     }
 
+    private bool IsReloadAnimationFinished()
+{
+    AnimatorStateInfo stateInfo = amimr.GetCurrentAnimatorStateInfo(1); // ใช้ layer ที่ 0 หรือ layer ที่คุณใช้กับ reload
+        
+        bool stats =  stateInfo.IsName("Reloading Weapon") && stateInfo.normalizedTime >= 1.0f;
+        // Debug.Log(stats);
+        return stateInfo.IsName("Reloading Weapon") && stateInfo.normalizedTime >= 1.0f;
+}
+
 
     public void PlayReloadAnimation()
     {
+        playerControllerWaepon.CurrentWeapon().isReloadingAimation = true;
+        Debug.Log(playerControllerWaepon.CurrentWeapon().isReloadingAimation);
         if (busyGrabingWeapon) return;
         amimr.SetBool("IsReloading", true);
         amimr.SetTrigger("Reload");
@@ -70,8 +92,11 @@ public class WeaponVisaulControler : MonoBehaviour
             rig.weight += rigIncreaseStep * Time.deltaTime;
             if (rig.weight >= 1)
             {
+                // Debug.Log("here");
                 isRigIncrease = false;
                 amimr.SetBool("IsReloading", false);
+                playerControllerWaepon.CurrentWeapon().isReloadingAimation = false;
+                Debug.Log(playerControllerWaepon.CurrentWeapon().isReloadingAimation);
             }
         }
     }

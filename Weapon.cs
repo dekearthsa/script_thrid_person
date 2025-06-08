@@ -1,3 +1,6 @@
+using System.Diagnostics;
+ 
+
 public enum WeaponType
 {
     Pistol,
@@ -14,14 +17,37 @@ public class Weapon
     public int bulletInMagazine;
     public int magzineCapacity;
     public int totalReserveAmmo;
+    public bool isReloadingAimation;
+
+
+    public void RefillBullet()
+    {
+        // int totalReserveAmmo = magzineCapacity; // // adding bullet in magzine
+        int bulletsToReload = magzineCapacity;
+ 
+
+        if (bulletsToReload > totalReserveAmmo)
+            bulletsToReload = totalReserveAmmo;
+
+        totalReserveAmmo -= bulletsToReload;
+        bulletInMagazine = bulletsToReload;
+
+        if (totalReserveAmmo < 0)
+            totalReserveAmmo = 0;
+
+    }
 
     public bool CanShoot()
     {
+        if (isReloadingAimation)
+            return false;
+
         return HaveEnoughBullet();
     }
 
     private bool HaveEnoughBullet()
     {
+        // UnityEngine.Debug.Log(bulletInMagazine);
         if (bulletInMagazine > 0)
         {
             bulletInMagazine--;
@@ -35,18 +61,12 @@ public class Weapon
 
     public bool CanReload()
     {
-        if (totalReserveAmmo > 0)
-        {
-            return true;
-        }
-        else
-        {
+        if (bulletInMagazine == magzineCapacity) 
             return false;
-        }
-    }
+ 
+        if (totalReserveAmmo > 0)
+            return true;
 
-    public void ReloadBullets()
-    {
-
+        return false;
     }
 }

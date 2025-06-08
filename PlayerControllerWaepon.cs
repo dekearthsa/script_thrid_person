@@ -93,6 +93,8 @@ public class PlayerControllerWaepon : MonoBehaviour
 
     public Transform GunPoint() => gunPoint;
 
+    public Weapon CurrentWeapon() => currentWeapon;
+
     private void AssignInputEvent()
     {
         PlayerControl controls = player.controls;
@@ -105,6 +107,7 @@ public class PlayerControllerWaepon : MonoBehaviour
             if (currentWeapon.CanReload())
             {
                 player.weaponVisaulControler.PlayReloadAnimation();
+                currentWeapon.RefillBullet();
             }
         };
     }
