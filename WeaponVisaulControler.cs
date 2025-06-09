@@ -3,22 +3,25 @@ using UnityEngine.Animations.Rigging;
 
 public class WeaponVisaulControler : MonoBehaviour
 {
+    private Player player;
     private Rig rig;
     private Animator amimr;
     private PlayerMovement playerMovement;
     private PlayerControllerWaepon playerControllerWaepon;
     // private WeaponVisaulControler weaponVisaulControler;
 
-    [Header("Gun")]
-    [SerializeField] private Transform[] gunTransform;
-    [SerializeField] private Transform pistol;
-    [SerializeField] private Transform revolver;
-    [SerializeField] private Transform rifle;
-    [SerializeField] private Transform shotgun;
-    [SerializeField] private Transform sniper;
+    [SerializeField] private WeaponModel[] weaponModels;
 
-    [Header("Left hand target tranform")]
-    public Transform currentGunPOS;
+    // [Header("Gun")]
+    // [SerializeField] private Transform[] gunTransform;
+    // [SerializeField] private Transform pistol;
+    // [SerializeField] private Transform revolver;
+    // [SerializeField] private Transform rifle;
+    // [SerializeField] private Transform shotgun;
+    // [SerializeField] private Transform sniper;
+
+    // [Header("Left hand target tranform")]
+    // public Transform currentGunPOS;
    
 
     [Header("Rig")]
@@ -38,11 +41,14 @@ public class WeaponVisaulControler : MonoBehaviour
 
     private void Start()
     {
-        SwitchGunOn(pistol);
+        // SwitchGunOn(pistol);
+        player = GetComponent<Player>();
         amimr = GetComponentInChildren<Animator>();
         rig = GetComponentInChildren<Rig>();
         playerMovement = GetComponentInChildren<PlayerMovement>();
         playerControllerWaepon = GetComponentInParent<PlayerControllerWaepon>();
+        weaponModels = GetComponentsInChildren<WeaponModel>(true);
+
         // currentWeapon = GetComponentInParent<Weapon>();
         // weaponVisaulControler = GetComponentInParent<WeaponVisaulControler>();
     }
@@ -64,14 +70,30 @@ public class WeaponVisaulControler : MonoBehaviour
         
     }
 
+
+    public WeaponModel CurrentWeaponModel()
+    {
+        WeaponModel weaponModel = null;
+        WeaponType weaponType = player.weapon.CurrentWeapon().weaponType;
+        for (int i = 0; i < weaponModels.Length; i++)
+        {
+            if (weaponModels[i].weaponType == weaponType)
+            {
+                weaponModel = weaponModels[i];
+            }
+        }
+        return weaponModel;
+
+    }
+
     private bool IsReloadAnimationFinished()
-{
-    AnimatorStateInfo stateInfo = amimr.GetCurrentAnimatorStateInfo(1); // ใช้ layer ที่ 0 หรือ layer ที่คุณใช้กับ reload
-        
-        bool stats =  stateInfo.IsName("Reloading Weapon") && stateInfo.normalizedTime >= 1.0f;
+    {
+        AnimatorStateInfo stateInfo = amimr.GetCurrentAnimatorStateInfo(1); // ใช้ layer ที่ 0 หรือ layer ที่คุณใช้กับ reload
+
+        bool stats = stateInfo.IsName("Reloading Weapon") && stateInfo.normalizedTime >= 1.0f;
         // Debug.Log(stats);
         return stateInfo.IsName("Reloading Weapon") && stateInfo.normalizedTime >= 1.0f;
-}
+    }
 
 
     public void PlayReloadAnimation()
@@ -96,7 +118,7 @@ public class WeaponVisaulControler : MonoBehaviour
                 isRigIncrease = false;
                 amimr.SetBool("IsReloading", false);
                 playerControllerWaepon.CurrentWeapon().isReloadingAimation = false;
-                Debug.Log(playerControllerWaepon.CurrentWeapon().isReloadingAimation);
+                // Debug.Log(playerControllerWaepon.CurrentWeapon().isReloadingAimation);
             }
         }
     }
@@ -139,7 +161,8 @@ public class WeaponVisaulControler : MonoBehaviour
         {   
             playerMovement.nowCombatMode = true;
             StartAnimationCombatMode();
-            SwitchGunOn(pistol);
+            // SwitchGunOn(pistol);
+            SwitchGunOn();
             ChangeAnimationGunFire(1);
             PlayerWeaponGrabAnimation(GrabType.BackGrab);
 
@@ -147,28 +170,32 @@ public class WeaponVisaulControler : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha2)) { 
             playerMovement.nowCombatMode = true;
             StartAnimationCombatMode();
-            SwitchGunOn(revolver); 
+            // SwitchGunOn(revolver); 
+            SwitchGunOn();
             ChangeAnimationGunFire(1); 
             PlayerWeaponGrabAnimation(GrabType.BackGrab);
             };
         if (Input.GetKeyDown(KeyCode.Alpha3)) { 
             playerMovement.nowCombatMode = true;
             StartAnimationCombatMode();
-            SwitchGunOn(rifle); 
+            // SwitchGunOn(rifle); 
+            SwitchGunOn();
             ChangeAnimationGunFire(1); 
             PlayerWeaponGrabAnimation(GrabType.SideGrab);
             };
         if (Input.GetKeyDown(KeyCode.Alpha4)) { 
             playerMovement.nowCombatMode = true;
             StartAnimationCombatMode();
-            SwitchGunOn(shotgun); 
+            // SwitchGunOn(shotgun); 
+            SwitchGunOn();
             ChangeAnimationGunFire(2); 
             PlayerWeaponGrabAnimation(GrabType.SideGrab);
             };
         if (Input.GetKeyDown(KeyCode.Alpha5)) { 
             playerMovement.nowCombatMode = true;
             StartAnimationCombatMode();
-            SwitchGunOn(sniper); 
+            // SwitchGunOn(sniper); 
+            SwitchGunOn();
             ChangeAnimationGunFire(3); 
             PlayerWeaponGrabAnimation(GrabType.SideGrab);
             };
@@ -185,25 +212,27 @@ public class WeaponVisaulControler : MonoBehaviour
     }
 
 
-    public void SwitchGunOn(Transform gunTransfrom)
+    public void SwitchGunOn()
     {
-        SwitchGunOff();
-        gunTransfrom.gameObject.SetActive(true);
-        currentGunPOS = gunTransfrom;
+        SwitchoffWeaponModels();
+        CurrentWeaponModel().gameObject.SetActive(true);
+        // gunTransfrom.gameObject.SetActive(true);
+        // currentGunPOS = gunTransfrom;
         AttachLeftHand();
     }
 
-    public void SwitchGunOff()
+    public void SwitchoffWeaponModels()
     {
-        for (int i = 0; i < gunTransform.Length; i++)
+        for (int i = 0; i < weaponModels.Length; i++)
         {
-            gunTransform[i].gameObject.SetActive(false);
+            weaponModels[i].gameObject.SetActive(false);
         }
     }
 
     private void AttachLeftHand()
     {
-        Transform targetTranform = currentGunPOS.GetComponentInChildren<LeftHandTargetTranform>().transform;
+        // Transform targetTranform = currentGunPOS.GetComponentInChildren<LeftHandTargetTranform>().transform;
+        Transform targetTranform = CurrentWeaponModel().holdPoint;  
         leftHandIK_target.localPosition = targetTranform.localPosition;
         leftHandIK_target.localRotation = targetTranform.localRotation;
 
@@ -224,4 +253,3 @@ public class WeaponVisaulControler : MonoBehaviour
 
 }
 
-public enum GrabType {SideGrab=0, BackGrab=1};

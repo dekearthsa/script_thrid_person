@@ -156,7 +156,7 @@ public class PlayerMovement : MonoBehaviour
             if(nowCombatMode){
                 animator.SetBool("IsCombat", false);
                 nowCombatMode= false;
-                 weaponVisaulControler.SwitchGunOff();
+                 weaponVisaulControler.SwitchoffWeaponModels();
                 for (int i = 1; i < animator.layerCount; i++)
                 {
                     animator.SetLayerWeight(i, 0);
@@ -166,7 +166,8 @@ public class PlayerMovement : MonoBehaviour
                 animator.SetBool("IsCombat", true);
                 nowCombatMode= true;
                 rig.weight = 1;
-                weaponVisaulControler.SwitchGunOn(weaponVisaulControler.currentGunPOS);
+                // weaponVisaulControler.SwitchGunOn(weaponVisaulControler.currentGunPOS);
+                weaponVisaulControler.SwitchGunOn();
                 for (int i = 1; i < animator.layerCount; i++)
                 {
                     animator.SetLayerWeight(i, 0);

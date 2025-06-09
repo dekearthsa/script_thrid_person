@@ -7,7 +7,7 @@ public enum WeaponType
     Revolver,
     AutoRifle,
     Shotgun,
-    Rifle,
+    Sniper,
 }
 
 [System.Serializable] // Make cl
