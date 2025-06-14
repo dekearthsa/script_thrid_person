@@ -11,4 +11,5 @@ public class WeaponModel : MonoBehaviour
     public HoldType holdType;
     public Transform gunPoint;
     public Transform holdPoint;
+
 }

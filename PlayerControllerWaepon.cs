@@ -34,6 +34,10 @@ public class PlayerControllerWaepon : MonoBehaviour
     private void EquipWeapon(int i)
     {
         currentWeapon = weaponSlots[i];
+
+        player.weaponVisaulControler.StartAnimationCombatMode();
+        player.weaponVisaulControler.SwitchoffWeaponModels();  
+        player.weaponVisaulControler.PlayWeaponEquibAnimation();    
     }
 
     private void DropWeapon()
@@ -41,6 +45,13 @@ public class PlayerControllerWaepon : MonoBehaviour
         if (weaponSlots.Count <= 1) return;
         weaponSlots.Remove(currentWeapon);
         currentWeapon = weaponSlots[0];
+    }
+
+    public void PickupWeapon(Weapon weapon)
+    {
+        // int MaxSlotsAllowed = 2;
+        if (weaponSlots.Count >= MaxSlotsAllowed) return;
+        weaponSlots.Add(weapon);
     }
 
 
@@ -84,12 +95,7 @@ public class PlayerControllerWaepon : MonoBehaviour
 
     }
 
-    public void PickupWeapon(Weapon weapon)
-    {
-        // int MaxSlotsAllowed = 2;
-        if (weaponSlots.Count >= MaxSlotsAllowed) return;
-        weaponSlots.Add(weapon);
-    }
+    
 
     public Transform GunPoint() => gunPoint;
 

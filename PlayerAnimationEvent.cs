@@ -9,7 +9,7 @@ public class PlayerAnimationEvent : MonoBehaviour
 
     private void Start()
     {
-         
+
         weaponVisaulControler = GetComponentInParent<WeaponVisaulControler>();
         playerControllerWaepon = GetComponentInParent<PlayerControllerWaepon>();
     }
@@ -21,14 +21,18 @@ public class PlayerAnimationEvent : MonoBehaviour
         playerControllerWaepon.CurrentWeapon().RefillBullet();
     }
 
-    public void ReturnRig(){
+    public void ReturnRig()
+    {
         weaponVisaulControler.ReturnWeightToOne();
         weaponVisaulControler.ReturnWieghtHandWeightIK();
     }
 
-    public void WeaponGrabIsOver(){
+    public void WeaponGrabIsOver()
+    {
         weaponVisaulControler.SetBusyGrabingWeapon(false);
     }
+
+    public void SwtichOnWeaponModel() => weaponVisaulControler.SwitchOnCurrentModel();
 
     // public void WeaponIsReloading(){
     //     weaponVisaulControler.ReturnBusyReloadingWeapon();

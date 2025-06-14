@@ -167,7 +167,7 @@ public class PlayerMovement : MonoBehaviour
                 nowCombatMode= true;
                 rig.weight = 1;
                 // weaponVisaulControler.SwitchGunOn(weaponVisaulControler.currentGunPOS);
-                weaponVisaulControler.SwitchGunOn();
+                weaponVisaulControler.SwitchOnCurrentModel();
                 for (int i = 1; i < animator.layerCount; i++)
                 {
                     animator.SetLayerWeight(i, 0);

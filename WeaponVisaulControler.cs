@@ -41,25 +41,20 @@ public class WeaponVisaulControler : MonoBehaviour
 
     private void Start()
     {
-        // SwitchGunOn(pistol);
+        // SwitchOnCurrentModel(pistol);
         player = GetComponent<Player>();
         amimr = GetComponentInChildren<Animator>();
         rig = GetComponentInChildren<Rig>();
         playerMovement = GetComponentInChildren<PlayerMovement>();
         playerControllerWaepon = GetComponentInParent<PlayerControllerWaepon>();
         weaponModels = GetComponentsInChildren<WeaponModel>(true);
-
-        // currentWeapon = GetComponentInParent<Weapon>();
-        // weaponVisaulControler = GetComponentInParent<WeaponVisaulControler>();
+ 
     }
 
     private void Update()
     {
-        CheckWeaponSwitch();
-        // if(Input.GetKeyDown(KeyCode.R) && (!busyGrabingWeapon)){
-        //     PlayReloadAnimation();
-
-        // }
+        // CheckWeaponSwitch();
+ 
         if (playerControllerWaepon.CurrentWeapon().isReloadingAimation == true && IsReloadAnimationFinished())
         {
             playerControllerWaepon.CurrentWeapon().isReloadingAimation = false;
@@ -99,7 +94,7 @@ public class WeaponVisaulControler : MonoBehaviour
     public void PlayReloadAnimation()
     {
         playerControllerWaepon.CurrentWeapon().isReloadingAimation = true;
-        Debug.Log(playerControllerWaepon.CurrentWeapon().isReloadingAimation);
+        // Debug.Log(playerControllerWaepon.CurrentWeapon().isReloadingAimation);
         if (busyGrabingWeapon) return;
         amimr.SetBool("IsReloading", true);
         amimr.SetTrigger("Reload");
@@ -138,7 +133,8 @@ public class WeaponVisaulControler : MonoBehaviour
     public void ReturnWeightToOne() => isRigIncrease = true;
     public void ReturnWieghtHandWeightIK() => shouldIncreaseLeftHandIKWeight = true;
  
-    private void PlayerWeaponGrabAnimation(GrabType grabType) {
+    public void PlayWeaponEquibAnimation() {
+        GrabType grabType = CurrentWeaponModel().grabType;
         // wepaonPOS = leftHandPOS.transform;
         // wepaonPOS.position = leftHandPOS.position;
         // wepaonPOS.rotation = leftHandPOS.rotation;
@@ -155,53 +151,53 @@ public class WeaponVisaulControler : MonoBehaviour
     }
  
 
-    private void CheckWeaponSwitch(){
+    // private void CheckWeaponSwitch(){
         
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {   
-            playerMovement.nowCombatMode = true;
-            StartAnimationCombatMode();
-            // SwitchGunOn(pistol);
-            SwitchGunOn();
-            ChangeAnimationGunFire(1);
-            PlayerWeaponGrabAnimation(GrabType.BackGrab);
+    //     if (Input.GetKeyDown(KeyCode.Alpha1))
+    //     {   
+    //         playerMovement.nowCombatMode = true;
+    //         StartAnimationCombatMode();
+    //         // SwitchOnCurrentModel(pistol);
+    //         SwitchOnCurrentModel();
+    //         SwtichAnimationLayer(1);
+    //         PlayWeaponEquibAnimation(GrabType.BackGrab);
 
-        };
-        if (Input.GetKeyDown(KeyCode.Alpha2)) { 
-            playerMovement.nowCombatMode = true;
-            StartAnimationCombatMode();
-            // SwitchGunOn(revolver); 
-            SwitchGunOn();
-            ChangeAnimationGunFire(1); 
-            PlayerWeaponGrabAnimation(GrabType.BackGrab);
-            };
-        if (Input.GetKeyDown(KeyCode.Alpha3)) { 
-            playerMovement.nowCombatMode = true;
-            StartAnimationCombatMode();
-            // SwitchGunOn(rifle); 
-            SwitchGunOn();
-            ChangeAnimationGunFire(1); 
-            PlayerWeaponGrabAnimation(GrabType.SideGrab);
-            };
-        if (Input.GetKeyDown(KeyCode.Alpha4)) { 
-            playerMovement.nowCombatMode = true;
-            StartAnimationCombatMode();
-            // SwitchGunOn(shotgun); 
-            SwitchGunOn();
-            ChangeAnimationGunFire(2); 
-            PlayerWeaponGrabAnimation(GrabType.SideGrab);
-            };
-        if (Input.GetKeyDown(KeyCode.Alpha5)) { 
-            playerMovement.nowCombatMode = true;
-            StartAnimationCombatMode();
-            // SwitchGunOn(sniper); 
-            SwitchGunOn();
-            ChangeAnimationGunFire(3); 
-            PlayerWeaponGrabAnimation(GrabType.SideGrab);
-            };
-    }
+    //     };
+    //     if (Input.GetKeyDown(KeyCode.Alpha2)) { 
+    //         playerMovement.nowCombatMode = true;
+    //         StartAnimationCombatMode();
+    //         // SwitchOnCurrentModel(revolver); 
+    //         SwitchOnCurrentModel();
+    //         SwtichAnimationLayer(1); 
+    //         PlayWeaponEquibAnimation(GrabType.BackGrab);
+    //         };
+    //     if (Input.GetKeyDown(KeyCode.Alpha3)) { 
+    //         playerMovement.nowCombatMode = true;
+    //         StartAnimationCombatMode();
+    //         // SwitchOnCurrentModel(rifle); 
+    //         SwitchOnCurrentModel();
+    //         SwtichAnimationLayer(1); 
+    //         PlayWeaponEquibAnimation(GrabType.SideGrab);
+    //         };
+    //     if (Input.GetKeyDown(KeyCode.Alpha4)) { 
+    //         playerMovement.nowCombatMode = true;
+    //         StartAnimationCombatMode();
+    //         // SwitchOnCurrentModel(shotgun); 
+    //         SwitchOnCurrentModel();
+    //         SwtichAnimationLayer(2); 
+    //         PlayWeaponEquibAnimation(GrabType.SideGrab);
+    //         };
+    //     if (Input.GetKeyDown(KeyCode.Alpha5)) { 
+    //         playerMovement.nowCombatMode = true;
+    //         StartAnimationCombatMode();
+    //         // SwitchOnCurrentModel(sniper); 
+    //         SwitchOnCurrentModel();
+    //         SwtichAnimationLayer(3); 
+    //         PlayWeaponEquibAnimation(GrabType.SideGrab);
+    //         };
+    // }
 
-    private void StartAnimationCombatMode(){
+    public void StartAnimationCombatMode(){
         amimr.SetBool("IsCombat", true);
         rig.weight = 1;
         for (int i = 1; i < amimr.layerCount; i++)
@@ -212,9 +208,12 @@ public class WeaponVisaulControler : MonoBehaviour
     }
 
 
-    public void SwitchGunOn()
+    public void SwitchOnCurrentModel()
     {
-        SwitchoffWeaponModels();
+        // SwitchoffWeaponModels();
+        int animationIdx = ((int)CurrentWeaponModel().holdType);
+        // StartAnimationCombatMode();
+        SwtichAnimationLayer(animationIdx);
         CurrentWeaponModel().gameObject.SetActive(true);
         // gunTransfrom.gameObject.SetActive(true);
         // currentGunPOS = gunTransfrom;
@@ -238,7 +237,7 @@ public class WeaponVisaulControler : MonoBehaviour
 
     }
 
-    private void ChangeAnimationGunFire(int animatorLayerIdx)
+    private void SwtichAnimationLayer(int animatorLayerIdx)
     {
         amimr.SetBool("IsReloading", false);
         
